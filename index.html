@@ -374,7 +374,7 @@
                             </p>
                             <p class="text-[13px] font-bold text-amber-900 leading-relaxed">
                                 暴雨將至！準備好後，點選【開始挑戰】。<br>
-                                在 10 秒內快速交替按下鍵盤 [←] 左方向鍵 和 [→] 右方向鍵 達 100 次！<br>
+                                在 10 秒內快速交替按下鍵盤 [←] 左方向鍵 和 [→] 右方向鍵 達 80 次！<br>
                                 （亦可交替點擊下方虛擬方向盤的【左鍵】與【右鍵】）
                             </p>
 
@@ -423,22 +423,12 @@
                             </div>
                             
                             <div class="text-base font-black text-amber-950">
-                                完成度: <span id="mash-count">0</span> / 100 | 剩餘時間: <span id="mash-timer">10.0</span>s
+                                完成度: <span id="mash-count">0</span> / 80 | 剩餘時間: <span id="mash-timer">10.0</span>s
                             </div>
 
                             <!-- 開始按鈕 -->
                             <button id="qte-start-btn" onclick="startQTEChallenge()" class="pixel-btn px-6 py-2.5 text-lg font-black rounded-lg text-amber-950 mx-auto block max-w-xs animate-bounce shadow-md">
                                 ▶ 開始挑戰
-                            </button>
-                        </div>
-
-                        <!-- 神秘任務結算層 -->
-                        <div id="secret-task-consequence" class="absolute inset-0 bg-[#f7e6c4] p-5 flex flex-col justify-center items-center text-center hidden z-40 border-4 border-pixelWoodDark rounded-lg">
-                            <h4 id="secret-task-res-title" class="text-2xl text-amber-900 font-black mb-4">結果</h4>
-                            <p id="secret-task-res-text" class="text-lg font-bold text-amber-950 leading-loose mb-6"></p>
-                            <div id="secret-task-stat-changes" class="flex justify-center gap-4 text-xl mb-6 bg-[#eecfa1] p-3 w-full border-2 border-pixelWoodDark rounded"></div>
-                            <button onclick="finishSecretTask()" class="pixel-btn w-full py-3 text-xl font-bold rounded-lg text-amber-950">
-                                接受結果，回到莊園
                             </button>
                         </div>
                     </div>
@@ -563,20 +553,20 @@
                     <div class="space-y-2">
                         <h4 class="text-amber-900 font-black flex items-start gap-2">
                             <span class="bg-pixelWoodDark text-white rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs mt-1">1</span>
-                            <span>思考中古時代生存的困難：</span>
+                            <span>思考中古時代生存的困難與效忠的重要：</span>
                         </h4>
                         <p class="text-amber-950 font-bold text-base leading-relaxed pl-8">
-                            想像一下，如果你一覺醒來變成了中世紀的平民，在剛才的遊戲體驗中，哪一個「困境」讓你覺得最崩潰、最難以忍受？對比我們現在的生活，你覺得現代社會有什麼制度或發明，是中世紀完全沒有的保障？
+                            不論你是辛苦種小麥的農民，還是打鐵製造工具的工匠，即便遭受領主嚴重壓迫（如搶奪工具、課重稅、強征入伍），卻依然無法逃離莊園。在那個混亂且沒有安全保障的時代，為什麼找個人「效忠」反而成了唯一的生存選擇？
                         </p>
                     </div>
 
                     <div class="space-y-2">
                         <h4 class="text-amber-900 font-black flex items-start gap-2">
                             <span class="bg-pixelWoodDark text-white rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs mt-1">2</span>
-                            <span>思考「效忠」的重要：</span>
+                            <span>思考「世襲階級」與現代教育的意義：</span>
                         </h4>
                         <p class="text-amber-950 font-bold text-base leading-relaxed pl-8">
-                            不論你是辛苦種小麥的農民，還是打鐵製造工具的工匠，即便遭受領主嚴重壓迫（如搶奪工具、課重稅、強征入伍），卻依然無法逃離莊園。在那個混亂的「黑暗時代」，為什麼依附封建「效忠與保護」網，成了活命的唯一選擇？
+                            體驗完中古平民「不論多努力都無法改變階級」後，你會如何重新看待自己現在所擁有的「受教育權」與「選擇職業的自由」？在未來的學習生活中，你打算如何把握這些中古平民夢寐以求的權利？
                         </p>
                     </div>
                 </div>
@@ -1039,16 +1029,14 @@
 
             mashCount = 0;
             lastPressed = '';
-            mashActive = false; // 預設先不啟動計時與連打
+            mashActive = false;
 
             document.getElementById('mash-count').innerText = 0;
             document.getElementById('mash-progress-bar').style.width = '0%';
             document.getElementById('mash-timer').innerText = '10.0';
 
-            // 顯示「開始挑戰」按鈕 (移除獨立的 AD 木製像素按鈕容器)
             document.getElementById('qte-start-btn').classList.remove('hidden');
 
-            // 動態初始化 QTE 畫面元素
             const pGraphic = document.getElementById('peasant-qte-graphic');
             const aGraphic = document.getElementById('artisan-qte-graphic');
             const wheatContainer = document.getElementById('wheat-container');
@@ -1057,8 +1045,8 @@
                 pGraphic.classList.remove('hidden');
                 aGraphic.classList.add('hidden');
                 wheatContainer.innerHTML = '';
-                // 預先生成 50 棵待收割的麥穗（每棵代表 2 次按鍵完成度，共 100 次）
-                for (let i = 0; i < 50; i++) {
+                // 生成 40 棵待收割麥穗（對應 80 次，平均每 2 次亮起 1 棵）
+                for (let i = 0; i < 40; i++) {
                     const stalk = document.createElement('span');
                     stalk.className = 'text-lg opacity-10 transition-all duration-75 filter grayscale inline-block select-none';
                     stalk.innerText = '🌾';
@@ -1068,7 +1056,6 @@
             } else {
                 pGraphic.classList.add('hidden');
                 aGraphic.classList.remove('hidden');
-                // 重設工匠工具零件顯示
                 document.getElementById('tool-handle').style.opacity = '0';
                 document.getElementById('tool-head').style.opacity = '0';
                 document.getElementById('tool-blade').style.opacity = '0';
@@ -1076,9 +1063,7 @@
             }
         }
 
-        // 當點選【開始挑戰】按鈕時觸發
         function startQTEChallenge() {
-            // 隱藏「開始挑戰」按鈕，學生此時可直接使用電腦鍵盤 [←]/[→] 鍵或 iPad 虛擬方向盤【左鍵】/【右鍵】進行連打
             document.getElementById('qte-start-btn').classList.add('hidden');
 
             mashActive = true;
@@ -1089,7 +1074,7 @@
                 mashTimer -= 0.1;
                 if (mashTimer <= 0) {
                     mashTimer = 0;
-                    endMashGame(mashCount >= 100);
+                    endMashGame(mashCount >= 80);
                 }
                 document.getElementById('mash-timer').innerText = mashTimer.toFixed(1);
             }, 100);
@@ -1098,20 +1083,18 @@
         function pressMash(button) {
             if (!mashActive) return;
 
-            // 強制交替按鍵 A-D-A-D 才有成效
             if (button !== lastPressed) {
                 mashCount++;
                 lastPressed = button;
                 document.getElementById('mash-count').innerText = mashCount;
                 
-                const percentage = Math.min(100, (mashCount / 100) * 100);
+                const percentage = Math.min(100, (mashCount / 80) * 100);
                 document.getElementById('mash-progress-bar').style.width = `${percentage}%`;
 
-                // 動態更新圖形視覺效果
                 if (playerClass === 'peasant') {
-                    // 100 次滿，每 2 次亮起一棵麥穗 (100/50 = 2)
+                    // 80次連打，每 2 次連擊解鎖亮起 1 棵麥穗
                     const activeCount = Math.floor(mashCount / 2);
-                    for (let i = 0; i < 50; i++) {
+                    for (let i = 0; i < 40; i++) {
                         const stalk = document.getElementById(`wheat-stalk-${i}`);
                         if (stalk) {
                             if (i < activeCount) {
@@ -1122,24 +1105,22 @@
                         }
                     }
                 } else {
-                    // 工匠工具打磨完成度：分三階段漸進顯現 (0-100 次)
                     const handle = document.getElementById('tool-handle');
                     const head = document.getElementById('tool-head');
                     const blade = document.getElementById('tool-blade');
                     const spark = document.getElementById('spark-effect');
 
-                    if (handle) handle.style.opacity = Math.min(1, percentage / 30); // 0-30% 木製手柄
-                    if (head) head.style.opacity = Math.max(0, Math.min(1, (percentage - 30) / 40)); // 30-70% 鐵質斧頭
-                    if (blade) blade.style.opacity = Math.max(0, Math.min(1, (percentage - 70) / 30)); // 70-100% 刀刃白邊
+                    if (handle) handle.style.opacity = Math.min(1, percentage / 30);
+                    if (head) head.style.opacity = Math.max(0, Math.min(1, (percentage - 30) / 40));
+                    if (blade) blade.style.opacity = Math.max(0, Math.min(1, (percentage - 70) / 30));
 
-                    // 閃爍鍛造火花特效
                     if (spark) {
                         spark.classList.remove('hidden');
                         setTimeout(() => spark.classList.add('hidden'), 60);
                     }
                 }
 
-                if (mashCount >= 100) {
+                if (mashCount >= 80) {
                     endMashGame(true);
                 }
             }
