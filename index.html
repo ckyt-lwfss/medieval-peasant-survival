@@ -431,6 +431,16 @@
                                 ▶ 開始挑戰
                             </button>
                         </div>
+
+                        <!-- 神秘任務結果與反饋覆蓋層 -->
+                        <div id="secret-task-consequence" class="absolute inset-0 bg-[#f7e6c4] p-5 flex flex-col justify-center items-center text-center hidden z-40 border-4 border-pixelWoodDark rounded-lg">
+                            <h4 id="secret-task-res-title" class="text-2xl text-red-800 font-black mb-4 animate-pulse">【 任務結果 】</h4>
+                            <p id="secret-task-res-text" class="text-lg font-bold text-amber-950 leading-loose mb-6"></p>
+                            <div id="secret-task-stat-changes" class="flex justify-center gap-4 text-xl mb-6 bg-[#eecfa1] p-3 w-full border-2 border-pixelWoodDark rounded"></div>
+                            <button onclick="finishSecretTask()" class="pixel-btn w-full py-3 text-xl font-bold rounded-lg text-amber-950">
+                                接受命運，繼續掙扎...
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -1005,11 +1015,11 @@
             if (ans === 'B') {
                 player.wealth += 10;
                 resTitle.innerText = "🎉 答對了！";
-                resText.innerText = "你非常清楚自己在封建體制下效忠的直接對象是【莊園領主】（而不是遙遠的國王或無關係的鄰近騎士）！領主高興地賜予你 10 枚金幣。";
+                resText.innerText = "你非常清楚在封建制度下，統治你的小莊園並提供你直接保護的人是【騎士】（最底層的領主）！你答對了，獲得 10 枚金幣。";
                 statChanges.innerHTML = `<span class="text-green-600">GOLD +10</span>`;
             } else {
                 resTitle.innerText = "❌ 答錯了！";
-                resText.innerText = "雖然國王是名義上的土地擁有者，但在莊園制中，直接賜予你土地、向你索取勞役並保護你生命安全的人是【莊園領主】。守衛嘲笑了你的無知。";
+                resText.innerText = "雖然國王是最高皇帝，但根據『我的附庸的附庸，不是我的附庸』，你直接服從的是擁有你莊園的直屬領主【騎士】。守衛嘲笑了你的無知。";
                 statChanges.innerHTML = `<span class="text-gray-500">無變動</span>`;
             }
 
