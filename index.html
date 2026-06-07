@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中古時代平民生存錄：復古像素版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pixelGrass: '#70a03c',      /* 活力嫩綠 */
+                        pixelDirt: '#df9b43',       /* 溫慢黃土色 */
+                        pixelWoodDark: '#4d2b12',   /* 深木色邊框 */
+                        pixelWoodLight: '#cda275',  /* 淺木紋 */
+                        pixelParchment: '#f7e6c4',  /* 對話框黃色羊皮紙色 */
+                        pixelTilled: '#6d4c2c'      /* 耕地深褐色 */
+                    },
+                    fontFamily: {
+                        pixel: ['"DotGothic16"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'DotGothic16', sans-serif;
+            background-color: #2b170c;
+            color: #fff;
+            user-select: none;
+            touch-action: manipulation;
+            image-rendering: pixelated; 
+        }
+
+        /* 復古木製邊框風格 */
+        .pixel-border {
+            border: 6px solid #4d2b12;
+            background-color: #f7e6c4;
+            color: #4d2b12;
+            box-shadow: 
+                inset -3px -3px 0px #b58350, 
+                inset 3px 3px 0px #fff,
+                4px 4px 0px rgba(0,0,0,0.4);
+            image-rendering: pixelated;
+        }
+
+        /* 經典復古按鈕 */
+        .pixel-btn {
+            background-color: #df9b43;
+            color: #4d2b12;
+            border: 3px solid #4d2b12;
+            box-shadow: inset -2px -2px 0px #b58350, inset 2px 2px 0px #fff;
+            transition: all 0.1s;
+        }
+        .pixel-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: inset 1px 1px 0px #b58350;
+        }
+        .pixel-btn:hover {
+            background-color: #e8ad5e;
+        }
+
+        /* D-Pad 復古木紋按鈕 */
+        .dpad-pixel {
+            background-color: #cda275;
+            border: 3px solid #4d2b12;
+            box-shadow: inset -2px -2px 0px #9e734c, inset 2px 2px 0px #fff;
+        }
+        .dpad-pixel:active {
+            background-color: #9e734c;
+            transform: translateY(2px);
+        }
+
+        /* 隱藏滾動條 */
+        ::-webkit-scrollbar { display: none; }
+
+        /* 畫面受傷震動特效 */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(0px, 0px) rotate(0deg); }
+        }
+        .shake-animation {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        /* 受傷紅光特效 */
+        @keyframes flashRed {
+            0% { box-shadow: inset 0 0 0px #dc2626; }
+            50% { box-shadow: inset 0 0 100px #dc2626; }
+            100% { box-shadow: inset 0 0 0px #dc2626; }
+        }
+        .flash-red {
+            animation: flashRed 0.5s ease-in-out;
+        }
+
+        /* 漂亮的氣泡對話提示 */
+        .speech-bubble {
+            background-color: #fff;
+            border: 3px solid #4d2b12;
+            border-radius: 8px;
+            color: #4d2b12;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-start p-2 md:p-4 bg-[#3a2214]">
+
+    <!-- 遊戲主容器 -->
+    <div id="game-container" class="w-full max-w-5xl transition-all duration-75 my-auto">
+
+        <!-- 開始畫面 Start Screen -->
+        <div id="start-screen" class="max-w-2xl w-full text-center space-y-6 my-10 p-8 pixel-border mx-auto rounded-xl">
+            <div class="relative inline-block mt-4">
+                <!-- 像素風格麥子 (由像素組成的自繪 SVG，契合復古農場風格) -->
+                <svg class="w-24 h-24 drop-shadow-[0_4px_0_#4d2b12] mx-auto animate-bounce" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="image-rendering: pixelated; shape-rendering: crispEdges;">
+                    <!-- 麥梗 -->
+                    <rect x="7" y="9" width="2" height="7" fill="#4d2b12" />
+                    
+                    <!-- 左側麥粒 -->
+                    <rect x="4" y="10" width="2" height="2" fill="#d97706" />
+                    <rect x="5" y="9" width="1" height="1" fill="#f59e0b" />
+                    <rect x="3" y="7" width="2" height="2" fill="#d97706" />
+                    <rect x="4" y="6" width="1" height="1" fill="#f59e0b" />
+                    <rect x="3" y="4" width="2" height="2" fill="#d97706" />
+                    <rect x="4" y="3" width="1" height="1" fill="#f59e0b" />
+                    
+                    <!-- 右側麥粒 -->
+                    <rect x="10" y="10" width="2" height="2" fill="#d97706" />
+                    <rect x="10" y="9" width="1" height="1" fill="#f59e0b" />
+                    <rect x="11" y="7" width="2" height="2" fill="#d97706" />
+                    <rect x="11" y="6" width="1" height="1" fill="#f59e0b" />
+                    <rect x="11" y="4" width="2" height="2" fill="#d97706" />
+                    <rect x="11" y="3" width="1" height="1" fill="#f59e0b" />
+                    
+                    <!-- 中間麥穗 -->
+                    <rect x="7" y="7" width="2" height="3" fill="#d97706" />
+                    <rect x="7" y="4" width="2" height="3" fill="#f59e0b" />
+                    <rect x="7" y="2" width="2" height="2" fill="#fef08a" />
+                    
+                    <!-- 麥芒 (尖刺) -->
+                    <rect x="6" y="1" width="1" height="2" fill="#d97706" />
+                    <rect x="9" y="1" width="1" height="2" fill="#d97706" />
+                    <rect x="2" y="3" width="2" height="1" fill="#d97706" />
+                    <rect x="12" y="3" width="2" height="1" fill="#d97706" />
+                    <rect x="2" y="6" width="2" height="1" fill="#d97706" />
+                    <rect x="12" y="6" width="2" height="1" fill="#d97706" />
+                </svg>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold tracking-widest text-amber-900 drop-shadow-[0_2px_0_#fff] leading-relaxed">
+                中古時代平民生存錄<br>
+                <span class="text-2xl text-amber-800">—— 生存考驗 ——</span>
+            </h1>
+
+            <div class="inline-block bg-amber-950/10 border-2 border-dashed border-pixelWoodDark px-6 py-3 rounded-lg text-amber-950 font-black text-base max-w-lg mx-auto shadow-sm">
+                🏆 終極挑戰：在這片無情的土地上，用盡一切手段保住最後一絲氣息與財產，直到漫長寒冬的落幕。你能撐過這場命運的終局嗎？
+            </div>
+
+            <p class="text-base text-amber-950 leading-loose max-w-lg mx-auto text-left font-bold border-t-2 border-dashed border-pixelWoodDark/30 pt-4">
+                你將回到混亂的封建時代，體驗最底層平民的命運。<br>
+                在看似安寧的像素莊園裡，等待你的卻是無情的封建特權、繁重的賦稅與不可避免的歷史宿命。<br>
+                <br>
+                <i class="fa-solid fa-gamepad text-amber-800 mr-2"></i> 操作指南：<br>
+                - 電腦玩家：使用 <span class="text-amber-800 font-black">WASD / 方向鍵</span> 移動<br>
+                - 移動端玩家：使用底部的 <span class="text-amber-800 font-black">虛擬方向盤</span> 移動<br>
+                - 走近閃爍金色光環的 NPC，按 <span class="text-amber-800 font-black">空白鍵 (Space)</span> 或點擊 <span class="text-amber-800 font-black">【對話】</span>
+            </p>
+            <button onclick="showClassSelection()" class="pixel-btn text-amber-950 font-black px-10 py-4 font-bold text-2xl w-full max-w-xs mx-auto block rounded-lg mt-6">
+                進入莊園 🌾
+            </button>
+        </div>
+
+        <!-- 身份選擇畫面 Class Selection Screen -->
+        <div id="class-screen" class="max-w-2xl w-full text-center space-y-6 my-10 p-8 pixel-border mx-auto rounded-xl hidden">
+            <h2 class="text-3xl font-black tracking-wider text-amber-900 drop-shadow-[0_1px_0_#fff]">
+                👤 選擇你的平民身份
+            </h2>
+            <p class="text-base text-amber-950 font-bold border-b border-dashed border-pixelWoodDark/20 pb-2 max-w-lg mx-auto">
+                在中世紀封建莊園中，不同的階級分工有著不同的生存起點，但壓迫與特權是無所不在的...
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <!-- Peasant Card -->
+                <div onclick="selectClass('peasant')" class="cursor-pointer border-4 border-pixelWoodDark/30 hover:border-pixelWoodDark bg-[#eecfa1]/50 p-5 rounded-xl flex flex-col items-center gap-3 transition-all transform hover:scale-105 shadow-md">
+                    <span class="text-6xl bg-pixelWoodLight p-3 rounded-full border-4 border-pixelWoodDark">🧑‍🌾</span>
+                    <h3 class="text-2xl font-black text-amber-950">農民</h3>
+                    <p class="text-sm text-amber-900 leading-relaxed font-bold">
+                        負責開墾荒地與種植小麥。雖然常年勞作使你體格較好，但絕大部分收成都要被領主強征。
+                    </p>
+                    <div class="w-full bg-pixelWoodDark/10 p-2 rounded text-xs font-black text-amber-950 border border-pixelWoodDark/20">
+                        ❤️ 生命力: 100
+                    </div>
+                </div>
+                <!-- Artisan Card -->
+                <div onclick="selectClass('artisan')" class="cursor-pointer border-4 border-pixelWoodDark/30 hover:border-pixelWoodDark bg-[#eecfa1]/50 p-5 rounded-xl flex flex-col items-center gap-3 transition-all transform hover:scale-105 shadow-md">
+                    <span class="text-6xl bg-pixelWoodLight p-3 rounded-full border-4 border-pixelWoodDark">🔨</span>
+                    <h3 class="text-2xl font-black text-amber-950">工匠</h3>
+                    <p class="text-sm text-amber-900 leading-relaxed font-bold">
+                        負責製造鐵器、修繕工具。雖然有些許手工業積蓄，但在封建特權下，勞動工具與成果隨時會被領主奪走。
+                    </p>
+                    <div class="w-full bg-pixelWoodDark/10 p-2 rounded text-xs font-black text-amber-950 border border-pixelWoodDark/20">
+                        ❤️ 生命力: 80
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 領主土地分封過渡畫面 Lord Land Grant & Fealty Screen -->
+        <div id="land-grant-screen" class="max-w-2xl w-full text-center space-y-6 my-10 p-8 pixel-border mx-auto rounded-xl hidden">
+            <h2 class="text-3xl font-black tracking-wider text-amber-900 drop-shadow-[0_1px_0_#fff]">
+                👑 領主的分封與恩賜
+            </h2>
+            <div class="flex items-center gap-4 bg-[#eecfa1] p-4 rounded-xl border-4 border-pixelWoodDark">
+                <span class="text-6xl select-none">🏰</span>
+                <p id="land-grant-intro" class="text-left text-base text-amber-950 font-bold leading-relaxed">
+                    領主高坐在戰路上，看著衣衫襤褸的你...
+                </p>
+            </div>
+
+            <div class="bg-amber-950/10 p-4 border-2 border-dashed border-pixelWoodDark rounded-lg space-y-3">
+                <p class="text-lg text-red-900 font-black">
+                    ❓ 領主分給了你土地和生產工具，作為平民（農民/工匠），此時你必須做什麼，才能換取這份恩賜與在莊園內受到城堡保護的權利？
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <button onclick="handleLandGrantChoice(false)" class="pixel-btn text-amber-950 font-black px-6 py-4 rounded-lg text-lg flex items-center justify-center gap-2">
+                        <span>😊 有禮貌地說謝謝</span>
+                    </button>
+                    <button onclick="handleLandGrantChoice(true)" class="pixel-btn text-amber-950 font-black px-6 py-4 rounded-lg text-lg bg-amber-500 hover:bg-amber-600 flex items-center justify-center gap-2">
+                        <span>🧎 單膝下跪宣誓效忠</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 反饋結果層 -->
+            <div id="grant-consequence" class="p-4 rounded-lg font-bold mt-4 hidden">
+                <p id="grant-consequence-text"></p>
+            </div>
+        </div>
+
+        <!-- 遊戲主介面 -->
+        <div id="game-screen" class="w-full hidden flex-col lg:flex-row gap-4">
+            
+            <!-- Left: 遊戲視窗 (Canvas + D-Pad) -->
+            <div class="flex-grow flex flex-col relative">
+                
+                <!-- 任務指示列 (仿復古任務提示紙) -->
+                <div class="pixel-border mb-2 p-3 px-4 text-base flex justify-between items-center rounded-lg">
+                    <span class="flex items-center gap-2 font-bold text-amber-900">
+                        <i class="fa-solid fa-scroll text-amber-700 animate-pulse"></i> 
+                        任務目標：<span id="quest-text" class="text-amber-950">載入中...</span>
+                    </span>
+                    <span class="text-amber-900 font-bold bg-[#eecfa1] px-3 py-1 rounded border-2 border-pixelWoodDark">
+                        第 <span id="day-indicator">1</span> 天 / 7
+                    </span>
+                </div>
+
+                <!-- 畫布區 Canvas -->
+                <div id="canvas-container" class="relative bg-pixelGrass flex justify-center items-center overflow-hidden border-8 border-pixelWoodDark rounded-xl shadow-2xl">
+                    <canvas id="gameCanvas" width="640" height="480" class="max-w-full h-auto aspect-[4/3] block image-rendering-pixelated"></canvas>
+                    
+                    <!-- 互動對話小氣泡提示 -->
+                    <div id="interact-prompt" class="absolute bottom-6 left-1/2 -translate-x-1/2 speech-bubble border-2 px-4 py-2 font-black text-sm hidden animate-bounce shadow-lg z-10">
+                        💬 按 【空白鍵】 或點擊 【對話】
+                    </div>
+
+                    <!-- 右上角復古日曆時鐘 -->
+                    <div class="absolute top-4 right-4 flex flex-col items-center select-none pointer-events-none z-10">
+                        <!-- 圓形日曆時鐘 -->
+                        <div class="w-24 h-24 rounded-full border-4 border-pixelWoodDark bg-[#eecfa1] shadow-lg flex flex-col items-center justify-center relative overflow-hidden">
+                            <!-- 上半部裝飾 (圓頂天空) -->
+                            <div class="absolute top-0 w-full h-1/2 bg-sky-400 flex items-center justify-center">
+                                <i class="fa-solid fa-sun text-yellow-300 text-lg"></i>
+                            </div>
+                            <!-- 下半部時間文字 -->
+                            <div class="absolute bottom-0 w-full h-1/2 bg-[#df9b43] border-t-2 border-pixelWoodDark flex flex-col items-center justify-center text-pixelWoodDark">
+                                <div class="text-[10px] font-bold tracking-widest leading-none">AUTUMN</div>
+                                <div id="clock-time" class="text-xs font-black">06:10 AM</div>
+                            </div>
+                        </div>
+                        <!-- 金幣計量器 -->
+                        <div class="mt-2 w-28 bg-[#df9b43] border-4 border-pixelWoodDark rounded px-2 py-0.5 flex items-center justify-between shadow-md text-pixelWoodDark font-black text-xs">
+                            <span>G</span>
+                            <span id="pixel-gold-display" class="tracking-wide text-right">50</span>
+                        </div>
+                    </div>
+
+                    <!-- 【重點升級】：觸發對話時，絕對定位覆蓋地圖畫面 -->
+                    <div id="dialogue-overlay" class="absolute inset-4 pixel-border z-20 flex flex-col justify-between p-6 hidden">
+                        <!-- 對話頂部：大頭照與姓名 -->
+                        <div class="flex items-center gap-3 border-b-2 border-pixelWoodDark/30 pb-3">
+                            <span id="overlay-dialogue-avatar" class="text-4xl bg-pixelWoodLight/40 p-1 rounded border-2 border-pixelWoodDark">🧑‍🌾</span>
+                            <h4 id="overlay-dialogue-name" class="text-2xl text-amber-900 font-black">任務人物</h4>
+                        </div>
+                        
+                        <!-- 打字機對話文字區 -->
+                        <div class="flex-grow my-4 overflow-y-auto">
+                            <p id="overlay-dialogue-text" class="text-lg leading-relaxed text-amber-950 font-bold">
+                                請靠近 NPC 進行談話...
+                            </p>
+                        </div>
+
+                        <!-- 抉擇選項區 -->
+                        <div id="overlay-choices-container" class="space-y-3 hidden flex-col">
+                            <button onclick="makeChoice(0)" class="pixel-btn w-full text-left p-3 text-sm md:text-base flex items-start gap-2 rounded-lg font-bold">
+                                <span class="text-amber-950">▶</span>
+                                <span id="overlay-choice-0-text">選項 A</span>
+                            </button>
+                            <button onclick="makeChoice(1)" class="pixel-btn w-full text-left p-3 text-sm md:text-base flex items-start gap-2 rounded-lg font-bold">
+                                <span class="text-amber-950">▶</span>
+                                <span id="overlay-choice-1-text">選項 B</span>
+                            </button>
+                        </div>
+
+                        <!-- 命運結算覆蓋層 -->
+                        <div id="overlay-consequence-layer" class="absolute inset-0 bg-[#f7e6c4] p-5 flex flex-col justify-center items-center text-center hidden z-30 border-4 border-pixelWoodDark rounded-lg">
+                            <h4 class="text-2xl text-red-800 font-black mb-4 animate-pulse">【 命運結果 】</h4>
+                            <p id="overlay-consequence-text" class="text-lg font-bold text-amber-950 leading-loose mb-6"></p>
+                            <div id="overlay-stat-changes" class="flex justify-center gap-4 text-xl mb-6 bg-[#eecfa1] p-3 w-full border-2 border-pixelWoodDark rounded"></div>
+                            <button onclick="nextTurn()" id="overlay-next-btn" class="pixel-btn w-full py-3 text-xl font-bold rounded-lg text-amber-950">
+                                接受命運，繼續掙扎...
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 【突發神秘任務覆蓋層】：完成對應關卡後強制觸發 -->
+                    <div id="secret-task-overlay" class="absolute inset-4 pixel-border z-30 flex flex-col justify-between p-6 hidden bg-[#f7e6c4]">
+                        <!-- 任務頂部標題 -->
+                        <div class="flex items-center gap-3 border-b-2 border-pixelWoodDark/30 pb-3">
+                            <span class="text-4xl bg-pixelWoodLight/40 p-1 rounded border-2 border-pixelWoodDark">🎁</span>
+                            <h4 class="text-2xl text-amber-900 font-black">✨ 突發神秘任務！</h4>
+                        </div>
+
+                        <!-- 任務一內容（問答題） -->
+                        <div id="secret-task-1-content" class="flex-grow my-4 flex flex-col justify-center text-center space-y-4 hidden">
+                            <p class="text-base font-bold text-amber-950 leading-relaxed">
+                                在莊園制度與封建體系中，你必須清楚誰握有你與土地的支配權...
+                            </p>
+                            <p class="text-xl md:text-2xl font-black text-red-900 animate-pulse">
+                                「問：你的領主是誰？」
+                            </p>
+                            <div class="grid grid-cols-1 gap-3 max-w-xs mx-auto w-full pt-2">
+                                <button onclick="answerSecretTask1('A')" class="pixel-btn p-2 text-sm font-bold text-amber-950 rounded-lg text-left">
+                                    A. 國王
+                                </button>
+                                <button onclick="answerSecretTask1('B')" class="pixel-btn p-2 text-sm font-bold text-amber-950 rounded-lg text-left">
+                                    B. 騎士
+                                </button>
+                                <button onclick="answerSecretTask1('C')" class="pixel-btn p-2 text-sm font-bold text-amber-950 rounded-lg text-left">
+                                    C. 鄰近莊園的貴族
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 任務二內容（動態手速 QTE 考驗） -->
+                        <div id="secret-task-2-content" class="flex-grow my-4 flex flex-col justify-center text-center space-y-3 hidden">
+                            <p id="mash-title" class="text-xl md:text-2xl font-black text-amber-950">
+                                任務載入中...
+                            </p>
+                            <p class="text-[13px] font-bold text-amber-900 leading-relaxed">
+                                暴雨將至！準備好後，點選【開始挑戰】。<br>
+                                在 10 秒內快速交替按下鍵盤 [←] 左方向鍵 和 [→] 右方向鍵 達 100 次！<br>
+                                （亦可交替點擊下方虛擬方向盤的【左鍵】與【右鍵】）
+                            </p>
+
+                            <!-- QTE 動態圖形反饋畫布 -->
+                            <div id="qte-visual-canvas" class="w-full h-32 bg-[#4d2b12]/10 border-2 border-pixelWoodDark rounded-lg flex items-center justify-center relative overflow-hidden mb-1">
+                                <!-- 農民：收割麥穗場景 -->
+                                <div id="peasant-qte-graphic" class="hidden flex-col items-center justify-center w-full h-full p-2">
+                                    <div class="flex flex-wrap gap-1 items-center justify-center h-20 w-full overflow-hidden" id="wheat-container"></div>
+                                    <div class="text-[11px] font-bold text-amber-950 mt-1">🌾 已收割的麥穗（按得越多，收割越滿！） 🌾</div>
+                                </div>
+                                <!-- 工匠：打鐵鍛造工具場景 -->
+                                <div id="artisan-qte-graphic" class="hidden flex-col items-center justify-center w-full h-full relative p-2">
+                                    <div class="relative w-24 h-20 flex items-center justify-center" id="tool-container">
+                                        <!-- 鐵砧 -->
+                                        <svg class="absolute bottom-0 w-20 h-8" viewBox="0 0 100 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M10 40 L90 40 L80 15 L50 15 L45 5 L15 5 L15 15 L20 15 Z" fill="#374151" stroke="#111827" stroke-width="3"/>
+                                            <rect x="35" y="40" width="30" height="10" fill="#1f2937" stroke="#111827" stroke-width="3"/>
+                                        </svg>
+                                        <!-- 打造中的斧頭 -->
+                                        <div id="crafting-tool-sprite" class="absolute top-0 transition-all duration-75" style="transform: translateY(4px);">
+                                            <svg class="w-12 h-12" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <!-- 木製手柄 -->
+                                                <rect id="tool-handle" x="28" y="20" width="8" height="40" fill="#b45309" stroke="#4d2b12" stroke-width="2" style="opacity: 0; transition: opacity 0.1s;"/>
+                                                <!-- 粗鐵斧頭 -->
+                                                <path id="tool-head" d="M24 12 L44 12 L48 24 L24 28 Z" fill="#9ca3af" stroke="#374151" stroke-width="2" style="opacity: 0; transition: opacity 0.1s;"/>
+                                                <!-- 亮銀開刃邊緣 -->
+                                                <path id="tool-blade" d="M44 12 L56 6 L56 30 L48 24 Z" fill="#e5e7eb" stroke="#374151" stroke-width="2" style="opacity: 0; transition: opacity 0.1s;"/>
+                                                <!-- 金色火花 -->
+                                                <g id="spark-effect" class="hidden">
+                                                    <circle cx="32" cy="20" r="6" fill="#fbbf24"/>
+                                                    <line x1="32" y1="12" x2="32" y2="6" stroke="#fbbf24" stroke-width="2"/>
+                                                    <line x1="32" y1="28" x2="32" y2="34" stroke="#fbbf24" stroke-width="2"/>
+                                                    <line x1="24" y1="20" x2="18" y2="20" stroke="#fbbf24" stroke-width="2"/>
+                                                    <line x1="40" y1="20" x2="46" y2="20" stroke="#fbbf24" stroke-width="2"/>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="text-[11px] font-bold text-amber-950 mt-1">🔨 打造中的工具（按得越多，工具越完整！） 🔨</div>
+                                </div>
+                            </div>
+
+                            <!-- 能量條 -->
+                            <div class="w-full bg-[#4d2b12] border-2 border-pixelWoodDark h-6 p-0.5 rounded-md max-w-xs mx-auto">
+                                <div id="mash-progress-bar" class="bg-gradient-to-r from-green-500 to-green-300 h-full rounded transition-all duration-75 w-0"></div>
+                            </div>
+                            
+                            <div class="text-base font-black text-amber-950">
+                                完成度: <span id="mash-count">0</span> / 100 | 剩餘時間: <span id="mash-timer">10.0</span>s
+                            </div>
+
+                            <!-- 開始按鈕 -->
+                            <button id="qte-start-btn" onclick="startQTEChallenge()" class="pixel-btn px-6 py-2.5 text-lg font-black rounded-lg text-amber-950 mx-auto block max-w-xs animate-bounce shadow-md">
+                                ▶ 開始挑戰
+                            </button>
+                        </div>
+
+                        <!-- 神秘任務結算層 -->
+                        <div id="secret-task-consequence" class="absolute inset-0 bg-[#f7e6c4] p-5 flex flex-col justify-center items-center text-center hidden z-40 border-4 border-pixelWoodDark rounded-lg">
+                            <h4 id="secret-task-res-title" class="text-2xl text-amber-900 font-black mb-4">結果</h4>
+                            <p id="secret-task-res-text" class="text-lg font-bold text-amber-950 leading-loose mb-6"></p>
+                            <div id="secret-task-stat-changes" class="flex justify-center gap-4 text-xl mb-6 bg-[#eecfa1] p-3 w-full border-2 border-pixelWoodDark rounded"></div>
+                            <button onclick="finishSecretTask()" class="pixel-btn w-full py-3 text-xl font-bold rounded-lg text-amber-950">
+                                接受結果，回到莊園
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 底部復古道具欄 Hotbar + 虛擬搖桿 -->
+                <div class="pixel-border p-4 flex flex-col md:flex-row justify-between items-center mt-2 rounded-xl gap-4">
+                    
+                    <!-- 道具欄外觀裝飾 -->
+                    <div class="flex gap-1 bg-[#4d2b12]/10 p-1 border-2 border-pixelWoodDark rounded-lg">
+                        <div id="hotbar-item-1" class="w-10 h-10 bg-[#eecfa1] border-2 border-pixelWoodDark rounded flex items-center justify-center shadow-inner relative group">
+                            <i id="hotbar-icon" class="fa-solid fa-wheat-awn text-amber-700"></i>
+                            <span class="absolute bottom-0 right-0.5 text-[10px] font-bold text-amber-950">1</span>
+                        </div>
+                        <div class="w-10 h-10 bg-[#eecfa1] border-2 border-pixelWoodDark rounded flex items-center justify-center shadow-inner relative">
+                            <i class="fa-solid fa-gavel text-amber-900 opacity-40"></i>
+                        </div>
+                        <div class="w-10 h-10 bg-[#eecfa1] border-2 border-pixelWoodDark rounded flex items-center justify-center shadow-inner relative">
+                            <i class="fa-solid fa-shield-halved text-amber-900 opacity-40"></i>
+                        </div>
+                        <div class="w-10 h-10 bg-[#eecfa1] border-2 border-pixelWoodDark rounded flex items-center justify-center shadow-inner relative">
+                            <i class="fa-solid fa-tree text-amber-900 opacity-40"></i>
+                        </div>
+                    </div>
+
+                    <!-- D-Pad 十字方向盤 (行動端專用美化) -->
+                    <div class="flex items-center gap-6">
+                        <div class="grid grid-cols-3 gap-1 w-32 h-32 bg-[#4d2b12] p-2 rounded-full relative shadow-inner">
+                            <div class="absolute inset-0 m-auto w-20 h-6 bg-[#9e734c] rounded"></div>
+                            <div class="absolute inset-0 m-auto w-6 h-20 bg-[#9e734c] rounded"></div>
+                            
+                            <div></div>
+                            <button id="btn-up" class="dpad-pixel rounded-t-lg z-10 flex items-center justify-center text-pixelWoodDark"><i class="fa-solid fa-caret-up text-lg"></i></button>
+                            <div></div>
+                            <button id="btn-left" class="dpad-pixel rounded-l-lg z-10 flex items-center justify-center text-pixelWoodDark"><i class="fa-solid fa-caret-left text-lg"></i></button>
+                            <div class="bg-[#4d2b12] z-10 flex items-center justify-center">
+                                <div class="w-2 h-2 bg-[#df9b43] rounded-full"></div>
+                            </div>
+                            <button id="btn-right" class="dpad-pixel rounded-r-lg z-10 flex items-center justify-center text-pixelWoodDark"><i class="fa-solid fa-caret-right text-lg"></i></button>
+                            <div></div>
+                            <button id="btn-down" class="dpad-pixel rounded-b-lg z-10 flex items-center justify-center text-pixelWoodDark"><i class="fa-solid fa-caret-down text-lg"></i></button>
+                            <div></div>
+                        </div>
+
+                        <!-- 交互大按鈕 -->
+                        <button id="btn-interact" class="pixel-btn w-20 h-20 rounded-full font-black text-lg text-amber-950 flex flex-col items-center justify-center shadow-lg">
+                            <i class="fa-solid fa-comments text-2xl mb-1"></i>
+                            對話
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: 狀態卡與學習導覽面板 -->
+            <div class="w-full lg:w-[320px] flex flex-col gap-4">
+                
+                <!-- 角色狀態欄 -->
+                <div class="pixel-border p-4 space-y-4 rounded-xl">
+                    <h3 class="text-xl text-amber-900 border-b-2 border-pixelWoodDark pb-2 mb-2 flex justify-between font-black">
+                        <span><i class="fa-solid fa-id-card"></i> 角色屬性卡</span>
+                        <span id="player-class-badge" class="text-xs bg-red-800 text-white px-2 py-0.5 rounded border border-pixelWoodDark">平民</span>
+                    </h3>
+
+                    <!-- HP -->
+                    <div>
+                        <div class="flex justify-between text-base mb-1 text-amber-950 font-bold">
+                            <span>❤️ 生命力 (HP)</span>
+                            <span id="health-val">100/100</span>
+                        </div>
+                        <div class="w-full bg-[#4d2b12] border-2 border-pixelWoodDark h-6 p-0.5 rounded-md">
+                            <div id="health-bar" class="bg-gradient-to-r from-red-600 to-red-400 h-full rounded transition-all duration-300 w-full relative">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-white opacity-30"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wealth -->
+                    <div>
+                        <div class="flex justify-between text-base mb-1 text-amber-950 font-bold">
+                            <span>🪙 財產價值 (Coins)</span>
+                            <span id="wealth-val">50 G</span>
+                        </div>
+                        <div class="w-full bg-[#4d2b12] border-2 border-pixelWoodDark h-6 p-0.5 rounded-md">
+                            <div id="wealth-bar" class="bg-gradient-to-r from-yellow-500 to-yellow-300 h-full rounded transition-all duration-300 w-[50%] relative">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-white opacity-50"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 莊園指南 (補充說明，豐富右側版面) -->
+                <div class="pixel-border p-4 space-y-3 rounded-xl bg-[#eecfa1]/50 flex-grow">
+                    <h3 class="text-lg text-amber-900 border-b border-dashed border-pixelWoodDark pb-2 font-black flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info"></i> 莊園生存要點
+                    </h3>
+                    <ul class="text-sm text-amber-950 font-bold space-y-2 leading-relaxed">
+                        <li>🌾 <strong class="text-amber-900">自給自足：</strong> 莊園是高度封閉的經濟體，物資與生產工具皆歸領主所有，無法對外採購。</li>
+                        <li>👑 <strong class="text-amber-900">世襲制度：</strong> 無論是農民或工匠，地位與義務皆為世襲。出生決定一切，社會階級徹底固化。</li>
+                        <li>🛡️ <strong class="text-amber-900">封建效忠：</strong> 平民以服侍領主、繳納重稅為代價，換取城堡與騎士的武力保護。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 結局畫面 Ending Screen -->
+        <div id="ending-screen" class="w-full hidden pixel-border p-8 space-y-6 my-10 max-w-3xl mx-auto rounded-xl">
+            <div class="text-center space-y-4">
+                <i class="fa-solid fa-skull text-6xl text-red-700 animate-bounce"></i>
+                <h2 class="text-4xl text-red-800 font-black tracking-widest">塵歸塵，土歸土</h2>
+                <p id="death-reason" class="text-lg text-amber-950 font-bold leading-loose max-w-xl mx-auto">
+                    歷史的齒輪碾碎了你。在這個封建社會裡，底層平民註定無法生存。
+                </p>
+            </div>
+
+            <!-- 兩大核心反思題目區 -->
+            <div class="bg-amber-950/10 p-6 border-4 border-pixelWoodDark mt-8 space-y-6 text-left text-lg rounded-lg text-amber-950">
+                <h3 class="text-2xl text-red-900 border-b-2 border-pixelWoodDark pb-2 font-black flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb"></i> 課堂反思與討論 (Debriefing)
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <h4 class="text-amber-900 font-black flex items-start gap-2">
+                            <span class="bg-pixelWoodDark text-white rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs mt-1">1</span>
+                            <span>思考中古時代生存的困難：</span>
+                        </h4>
+                        <p class="text-amber-950 font-bold text-base leading-relaxed pl-8">
+                            想像一下，如果你一覺醒來變成了中世紀的平民，在剛才的遊戲體驗中，哪一個「困境」讓你覺得最崩潰、最難以忍受？對比我們現在的生活，你覺得現代社會有什麼制度或發明，是中世紀完全沒有的保障？
+                        </p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h4 class="text-amber-900 font-black flex items-start gap-2">
+                            <span class="bg-pixelWoodDark text-white rounded-full w-6 h-6 flex items-center justify-center shrink-0 text-xs mt-1">2</span>
+                            <span>思考「效忠」的重要：</span>
+                        </h4>
+                        <p class="text-amber-950 font-bold text-base leading-relaxed pl-8">
+                            不論你是辛苦種小麥的農民，還是打鐵製造工具的工匠，即便遭受領主嚴重壓迫（如搶奪工具、課重稅、強征入伍），卻依然無法逃離莊園。在那個混亂的「黑暗時代」，為什麼依附封建「效忠與保護」網，成了活命的唯一選擇？
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-6 text-center">
+                <button onclick="location.reload()" class="pixel-btn px-8 py-3 text-xl font-bold rounded-lg text-amber-950">
+                    重新回到莊園 (再次挑戰)
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 遊戲邏輯 Game JS Logic -->
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+
+        // 玩家狀態與職業設定
+        let playerClass = 'peasant'; // 'peasant' (農民) or 'artisan' (工匠)
+        let playerEmoji = '🧑‍🌾';
+        let player = { x: 80, y: 120, width: 32, height: 32, speed: 4, health: 100, wealth: 40 };
+        let currentDay = 1;
+        let isTaskActive = false;
+        let isTyping = false; 
+
+        // 實體神秘任務道具設定 (新增地圖實體)
+        let chest = { x: 200, y: 200, active: false, emoji: '🎁' };
+        let toolItem = { x: 440, y: 240, active: false, emoji: '🌾' }; // 依職業設定 麥穗 或 斧頭
+
+        // 神秘任務相關變數
+        let secretTask1Done = false;
+        let secretTask2Done = false;
+        let mashCount = 0;
+        let lastPressed = '';
+        let mashActive = false;
+        let mashTimer = 10.0;
+        let mashInterval = null;
+
+        let keys = {};
+        window.addEventListener('keydown', e => { 
+            const k = e.key.toLowerCase();
+            keys[k] = true; 
+            
+            // 防止方向鍵與空白鍵滾動網頁，優化操作體驗
+            if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) {
+                e.preventDefault();
+            }
+            
+            // 監聽神秘任務 QTE 手動輸入 (改用左右方向鍵進行連打)
+            if (mashActive) {
+                if (k === 'arrowleft') pressMash('L');
+                if (k === 'arrowright') pressMash('R');
+            }
+        });
+        window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+        const TILE_SIZE = 40;
+        const COLS = 16;
+        const ROWS = 12;
+
+        // 地圖配置 (1=阻擋障礙物, 0=可行走草地/泥地路徑)
+        const mapMatrix = [
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,1,1,1,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,1,1,1,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1], // <--- 欄杆對應的位置已重置為 0，角色與動物均可順暢穿梭通過
+            [1,0,0,0,0,0,1,1,1,1,1,1,1,1,0,1], 
+            [1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,1], 
+            [1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,1], 
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,1,1,1,1,0,1],
+            [1,0,0,0,0,0,0,0,0,0,1,1,1,1,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        ];
+
+        // 像素風格的動物資料
+        const animals = [
+            { type: 'cow', x: 120, y: 180, vx: 0.2, vy: 0, emoji: '🐄', timer: 0 },
+            { type: 'goat', x: 380, y: 320, vx: 0, vy: -0.2, emoji: '🐐', timer: 0 },
+            { type: 'chicken', x: 100, y: 120, vx: 0.1, vy: 0.1, emoji: '🐔', timer: 0 },
+            { type: 'chicken', x: 420, y: 360, vx: -0.15, vy: 0, emoji: '🐔', timer: 0 }
+        ];
+
+        // 7大 NPC 設定 (城堡守衛坐落於中央城堡門口處：x: 320, y: 280)
+        const npcs = {
+            tax_collector: { name: "莊園管家", x: 120, y: 320, emoji: "👔", color: "#f87171" },
+            steward:       { name: "副管家", x: 440, y: 160, emoji: "🕵️", color: "#60a5fa" },
+            miller:        { name: "磨坊工",   x: 120, y: 80,  emoji: "👨‍🌾", color: "#fbbf24" },
+            knight:        { name: "騎士領隊", x: 360, y: 80,  emoji: "💂", color: "#ef4444" },
+            forester:      { name: "巡林員",   x: 480, y: 360, emoji: "🏹", color: "#34d399" },
+            sick_villager: { name: "生病平民", x: 200, y: 280, emoji: "🧟", color: "#a78bfa" },
+            castle_guard:  { name: "城堡守衛", x: 320, y: 280, emoji: "🛡️", color: "#f43f5e" }
+        };
+
+        // 7天生存危機關卡設定 (高度融入"世襲制度"與"自給自足莊園經濟"學科考點)
+        const questData = {
+            1: { 
+                target: "tax_collector", 
+                targetName: "莊園管家", 
+                guidePeasant: "前往左下角麥田繳納糧稅", 
+                guideArtisan: "前往左下角向管家申報手工業收成",
+                dialoguePeasant: "「秋收已到！在自給自足的莊園裡，你種的麥子是唯一的口糧。但根據領地法規，領主必須抽走 80% 作地租。而且，因為『世襲制度』，你的子孫也注定是農奴，世世代代都要接受這種剝削！」",
+                dialogueArtisan: "「秋收已到！莊園是封閉且自足的，你製造的鐵器是生產的關鍵。但根據規定，你必須無償為領主修繕城堡所有兵器，並繳納重稅！因為『世襲制度』，你的後代也注定是卑微的工匠，無法跨越階級！」",
+                choices: [
+                    { text: "乖乖交稅 (履行義務)", consequence: "你交出了成果。但在自給自足的莊園中你無法外購糧食，冬天注定要挨餓了。而且『世襲制』代表你和後代將永遠被困在這個階級裡。", effect: { h: -10, w: -10 } },
+                    { text: "私藏部分糧食/財物", consequence: "被守衛當場搜出！作為世襲且毫無保障的底層平民，你被重打三十鞭並沒收所有財產。失去了物資，全家在封閉莊園裡只有死路一條。", effect: { h: -45, w: -35 } }
+                ]
+            },
+            2: { 
+                target: "steward", 
+                targetName: "副管家", 
+                guidePeasant: "前往右側查看被毀壞的農田", 
+                guideArtisan: "前往作坊路口應付官員檢查",
+                dialoguePeasant: "「領主大人昨天狩獵野豬，他的戰馬不小心踩爛了你僅有的菜園。在自給自足的莊園裡，這等於斷了你的食物來源。你要抗議嗎？」",
+                dialogueArtisan: "「領主大人昨天狩獵路過，看中了你作坊裡最好的一把精鍛獵刀，直接拿走而未付一分錢。在封閉自足的莊園裡，你要抗議嗎？」",
+                choices: [
+                    { text: "低頭忍耐，摸摸鼻子算了", consequence: "你保全了性命。但在莊園經濟中，失去了賴以生存的食物與工具，你的身體更加虛弱了。", effect: { h: -10, w: -5 } },
+                    { text: "前往城堡申訴", consequence: "城堡法庭的法官就是領主本人！你因『頂頂撞貴族』被重打一頓棍子，受了重傷抬回家。", effect: { h: -35, w: 0 } }
+                ]
+            },
+            3: { 
+                target: "miller", 
+                targetName: "磨坊工", 
+                guidePeasant: "前往左上角磨坊磨粉", 
+                guideArtisan: "前往磨坊購買風力動力",
+                dialoguePeasant: "「在自給自足的莊園裡，磨坊、熔爐等設施均被領主壟斷。你必須使用領主的石磨磨粉，並繳交高額使用費。你想怎麼做？」",
+                dialogueArtisan: "「在自給自足的莊園裡，所有設備都歸領主所有。領主規定，工匠製造器具必須付費使用城堡的風力磨床，嚴禁私設風磨！」",
+                choices: [
+                    { text: "繳交高額「磨坊使用稅」", consequence: "錢包徹底癟了，但至少能合法獲得工具與麵粉，繼續維持莊園內的生存。", effect: { h: 0, w: -20 } },
+                    { text: "半夜在家偷偷用粗石磨加工", consequence: "管家破門而入！你違反了領主對基礎加工設施的絕對壟斷，被沒收所有生產工具並被打得皮開肉綻。", effect: { h: -25, w: -25 } }
+                ]
+            },
+            4: { 
+                target: "knight", 
+                targetName: "騎士領隊", 
+                guidePeasant: "前往上方城堡大門響應徵召", 
+                guideArtisan: "前往上方城堡修補軍隊皮甲",
+                dialoguePeasant: "「鄰國來犯！根據封建契約，你必須響應徵召為領主出征。拿上這把草叉，跟隨隊伍衝鋒！」",
+                dialogueArtisan: "「鄰國來犯！你必須為領主無償搶修皮甲。防線吃緊，你也得拿上鐵錘當雜兵，出發！」",
+                choices: [
+                    { text: "跟隨軍隊，硬著頭皮出征", consequence: "這是一場殘酷的屠殺。你被重裝騎士的戰馬撞傷，戰後只分到微薄的敷料錢。", effect: { h: -35, w: +10 } },
+                    { text: "當逃兵躲進皇家森林", consequence: "逃兵是死罪！巡林員的獵犬很快咬到了你，你被在莊園裡當場處決。", effect: { h: -100, w: 0 } }
+                ]
+            },
+            5: { 
+                target: "forester", 
+                targetName: "巡林員", 
+                guidePeasant: "前往右下角林地邊緣尋找乾柴", 
+                guideArtisan: "前往森林尋找鍛鐵所需的木炭原料",
+                dialoguePeasant: "「站住！森林裡的野兔和乾柴全屬領主財產，嚴禁平民私採！否則留下你的手指！」",
+                dialogueArtisan: "「作坊缺乏生火燃料，但皇家森林的一草一木全屬領主所有。敢私自砍伐，就要受罰！」",
+                choices: [
+                    { text: "冒死在森林深處偷運資源", consequence: "被抓個正著！作為處罰，你被砍掉了兩根手指。這就是領主在自給自足莊園中的絕對所有權。", effect: { h: -30, w: -20 } },
+                    { text: "挖一些乾癟樹皮與枯葉充飢", consequence: "樹皮極難消化，你挨餓受凍，胃部劇痛，身體極度衰弱。", effect: { h: -25, w: 0 } }
+                ]
+            },
+            6: { 
+                target: "sick_villager", 
+                targetName: "生病平民", 
+                guidePeasant: "前往地圖中央探望鄰居", 
+                guideArtisan: "前往地圖中央幫生病幫工修補房屋",
+                dialoguePeasant: "「黑死病來了...到處是跳蚤和病死的老鼠，求求你帶我逃離莊園吧...」",
+                dialogueArtisan: "「作坊的幫工染上了鼠疫...他渾身黑斑，痛苦地求你施捨點錢買藥...」",
+                choices: [
+                    { text: "拋棄一切，跟隨人群往外逃難", consequence: "逃難人群成了瘟疫傳播的溫床。你在路上不幸感染了鼠疫，痛苦病死在路邊。", effect: { h: -100, w: 0 } },
+                    { text: "自我隔離，躲進寒冷封閉的穀倉", consequence: "物理隔離讓你成功避開了跳蚤傳播。你沒得鼠疫，但在嚴寒與飢餓中差點凍死。", effect: { h: -30, w: -10 } }
+                ]
+            },
+            7: { 
+                target: "castle_guard", 
+                targetName: "城堡守衛", 
+                guidePeasant: "敵對莊園入侵！立刻逃到中央城堡大門！", 
+                guideArtisan: "敵對莊園入侵！立刻逃到中央城堡大門！",
+                dialoguePeasant: "「站住！外面敵軍壓境，但城堡空間有限，只讓貴族進去！平民農民想進城避難，要麼交出你最後所有的財產當買命錢，要麼就在城牆外拿草叉當肉盾防守！」",
+                dialogueArtisan: "「站住！外面敵軍壓境，但城堡空間有限，只讓貴族進去！平民工匠想進城避難，要麼交出你作坊所有的工具和剩餘金錢，要麼就在城牆外當肉盾防守！」",
+                choices: [
+                    { text: "交出所有財產當買命錢", consequence: "你交出了最後一枚銅板。你進了城堡，但在莊園遭到外部洗劫、你又身無分文的情況下，你在城堡角落裡活活餓死。這就是平民在封建社會中的命運。", effect: { h: 0, w: -100 } },
+                    { text: "留在城牆外充當肉盾防守", consequence: "你被守衛無情地推到防線最前方。敵對莊園的重裝騎士發起衝鋒，你手無寸鐵被無情踐踏而死。這就是封建世襲制度下，底層平民的悲慘犧牲品宿命。", effect: { h: -100, w: 0 } }
+                ]
+            }
+        };
+
+        function showClassSelection() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('class-screen').classList.remove('hidden');
+        }
+
+        function selectClass(type) {
+            playerClass = type;
+            document.getElementById('class-screen').classList.add('hidden');
+            document.getElementById('land-grant-screen').classList.remove('hidden');
+
+            const introText = document.getElementById('land-grant-intro');
+            if (playerClass === 'peasant') {
+                playerEmoji = '🧑‍🌾';
+                player.health = 100;
+                player.wealth = 40;
+                toolItem.emoji = '🌾'; // 農民出現麥穗
+                introText.innerHTML = "領主高坐在馬背上，指向莊園一角對你說：『農民！這片莊園的麥田准許你耕種。當外族或強盜來襲時，城堡的騎士會保護你的安全！』";
+            } else {
+                playerEmoji = '🔨';
+                player.health = 80;
+                player.wealth = 70;
+                toolItem.emoji = '🪓'; // 工匠出現斧頭
+                introText.innerHTML = "領主高坐在馬背上，俯視著你：『工匠！城堡旁的打鐵工作坊和工具准許你使用，你的生產將受到我法律的庇護！』";
+            }
+        }
+
+        // 統一更新玩家狀態數值的 UI 顯示
+        function updatePlayerStatsUI() {
+            const maxHp = (playerClass === 'peasant') ? 100 : 80;
+            document.getElementById('health-val').innerText = `${player.health}/${maxHp}`;
+            document.getElementById('health-bar').style.width = `${(player.health / maxHp) * 100}%`;
+            document.getElementById('wealth-val').innerText = `${player.wealth} G`;
+            document.getElementById('wealth-bar').style.width = `${Math.min(100, player.wealth)}%`;
+            document.getElementById('pixel-gold-display').innerText = player.wealth;
+        }
+
+        // 處理土地分封的歷史抉擇
+        function handleLandGrantChoice(isCorrect) {
+            const consDiv = document.getElementById('grant-consequence');
+            const consText = document.getElementById('grant-consequence-text');
+            consDiv.classList.remove('hidden');
+
+            if (!isCorrect) {
+                player.health -= 10;
+                if (player.health < 10) player.health = 10; 
+
+                consDiv.className = "p-4 bg-red-100 border-4 border-red-800 text-red-950 rounded-lg font-bold mt-4 animate-bounce";
+                consText.innerHTML = "❌ 領主勃然大怒！<br>『說謝謝？你把這當作茶話會嗎？這是封建莊園契約！沒有效忠，就沒有保護！來人，抽打這狂妄的傢伙！』<br>你被鞭笞，生命值扣除 10 點！";
+            } else {
+                consDiv.className = "p-4 bg-green-100 border-4 border-green-800 text-green-950 rounded-lg font-bold mt-4";
+                consText.innerHTML = "✅ 你雙膝下跪，低下頭顱恭敬宣誓：<br>『我將為您效忠，一生履行我的封建義務！』<br>領主滿意地笑了，准許你正式進入莊園。";
+                
+                // 延遲兩秒進入遊戲畫面
+                setTimeout(() => {
+                    document.getElementById('land-grant-screen').classList.add('hidden');
+                    document.getElementById('game-screen').classList.remove('hidden');
+                    document.getElementById('game-screen').classList.add('flex');
+
+                    // 同步生命和金幣
+                    updatePlayerStatsUI();
+
+                    if (playerClass === 'peasant') {
+                        document.getElementById('player-class-badge').innerText = "農民";
+                        document.getElementById('player-class-badge').className = "text-xs bg-green-800 text-white px-2 py-0.5 rounded border border-pixelWoodDark";
+                        document.getElementById('hotbar-icon').className = "fa-solid fa-wheat-awn text-amber-700";
+                    } else {
+                        document.getElementById('player-class-badge').innerText = "工匠";
+                        document.getElementById('player-class-badge').className = "text-xs bg-amber-800 text-white px-2 py-0.5 rounded border border-pixelWoodDark";
+                        document.getElementById('hotbar-icon').className = "fa-solid fa-hammer text-amber-900";
+                    }
+
+                    document.getElementById('grant-consequence').classList.add('hidden');
+
+                    updateQuest();
+                    gameLoop();
+                }, 2500);
+            }
+        }
+
+        // 行動端 D-Pad 支援
+        const setupDpad = (id, key) => {
+            const btn = document.getElementById(id);
+            const press = (e) => { 
+                e.preventDefault(); 
+                keys[key] = true; 
+                // 神秘任務二：在 QTE 連打期間，點擊虛擬方向盤【左鍵】或【右鍵】直接對應 QTE 運算
+                if (mashActive) {
+                    if (id === 'btn-left') pressMash('L');
+                    if (id === 'btn-right') pressMash('R');
+                }
+            };
+            const release = (e) => { e.preventDefault(); keys[key] = false; };
+            btn.addEventListener('mousedown', press);
+            btn.addEventListener('mouseup', release);
+            btn.addEventListener('mouseleave', release);
+            btn.addEventListener('touchstart', press);
+            btn.addEventListener('touchend', release);
+        };
+        setupDpad('btn-up', 'w');
+        setupDpad('btn-down', 's');
+        setupDpad('btn-left', 'a');
+        setupDpad('btn-right', 'd');
+
+        // 互動按鈕
+        const triggerInteraction = () => {
+            if (isTaskActive || isTyping) return;
+
+            // 優先檢查與神秘寶箱的觸碰互動
+            if (chest.active) {
+                const dist = Math.hypot((player.x + 16) - (chest.x + 16), (player.y + 16) - (chest.y + 16));
+                if (dist < 45) {
+                    showSecretTask1();
+                    return;
+                }
+            }
+
+            // 優先檢查與神秘物資的觸碰互動
+            if (toolItem.active) {
+                const dist = Math.hypot((player.x + 16) - (toolItem.x + 16), (player.y + 16) - (toolItem.y + 16));
+                if (dist < 45) {
+                    showSecretTask2();
+                    return;
+                }
+            }
+
+            const currentQuest = questData[currentDay];
+            const npc = npcs[currentQuest.target];
+            const dist = Math.hypot((player.x + 16) - (npc.x + 20), (player.y + 16) - (npc.y + 20));
+            if (dist < 50) startDialogue(currentQuest);
+        };
+        document.getElementById('btn-interact').addEventListener('click', triggerInteraction);
+        window.addEventListener('keydown', e => { if (e.key === ' ') { e.preventDefault(); triggerInteraction(); }});
+
+        let typeInterval;
+        function typeWriter(text, elementId, speed, callback) {
+            let i = 0;
+            isTyping = true;
+            document.getElementById(elementId).innerHTML = "";
+            clearInterval(typeInterval);
+            typeInterval = setInterval(() => {
+                if (i < text.length) {
+                    document.getElementById(elementId).innerHTML += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typeInterval);
+                    isTyping = false;
+                    if(callback) callback();
+                }
+            }, speed);
+        }
+
+        function startDialogue(quest) {
+            isTaskActive = true;
+            
+            // 顯示覆蓋對話框
+            const overlay = document.getElementById('dialogue-overlay');
+            overlay.classList.remove('hidden');
+
+            document.getElementById('overlay-dialogue-name').innerText = quest.targetName;
+            document.getElementById('overlay-dialogue-avatar').innerText = npcs[quest.target].emoji;
+            document.getElementById('overlay-choices-container').classList.add('hidden'); 
+            
+            const dialogueText = (playerClass === 'peasant') ? quest.dialoguePeasant : quest.dialogueArtisan;
+
+            typeWriter(dialogueText, 'overlay-dialogue-text', 35, () => {
+                document.getElementById('overlay-choice-0-text').innerText = quest.choices[0].text;
+                document.getElementById('overlay-choice-1-text').innerText = quest.choices[1].text;
+                document.getElementById('overlay-choices-container').classList.remove('hidden');
+                document.getElementById('overlay-choices-container').classList.add('flex');
+            });
+        }
+
+        function makeChoice(choiceIdx) {
+            const quest = questData[currentDay];
+            const choice = quest.choices[choiceIdx];
+
+            player.health += choice.effect.h;
+            player.wealth += choice.effect.w;
+            player.health = Math.max(0, player.health);
+            player.wealth = Math.max(0, player.wealth);
+
+            // 更新 UI 數據
+            updatePlayerStatsUI();
+
+            // 受傷特效 (抖動與發紅)
+            const container = document.getElementById('game-container');
+            const canvasContainer = document.getElementById('canvas-container');
+            if (choice.effect.h < 0) {
+                container.classList.add('shake-animation');
+                canvasContainer.classList.add('flash-red');
+                setTimeout(() => {
+                    container.classList.remove('shake-animation');
+                    canvasContainer.classList.remove('flash-red');
+                }, 500);
+            }
+
+            // 結算與反饋 (寫在覆蓋層的 Consequence Layer 中)
+            document.getElementById('overlay-consequence-text').innerText = choice.consequence;
+            let statHtml = '';
+            if (choice.effect.h !== 0) statHtml += `<span class="${choice.effect.h > 0 ? 'text-green-600' : 'text-red-600'}">HP ${choice.effect.h > 0 ? '+' : ''}${choice.effect.h}</span>`;
+            if (choice.effect.w !== 0) statHtml += `<span class="${choice.effect.w > 0 ? 'text-green-600' : 'text-yellow-600'}">GOLD ${choice.effect.w > 0 ? '+' : ''}${choice.effect.w}</span>`;
+            document.getElementById('overlay-stat-changes').innerHTML = statHtml;
+            
+            document.getElementById('overlay-consequence-layer').classList.remove('hidden');
+        }
+
+        function nextTurn() {
+            // 隱藏命運與原本的對話結算
+            document.getElementById('overlay-consequence-layer').classList.add('hidden');
+
+            if (player.health <= 0 || player.wealth <= 0) { endGame(); return; }
+
+            // 第一關卡結束後，在地圖上產生寶箱
+            if (currentDay === 1 && !secretTask1Done && !chest.active) {
+                chest.active = true;
+                document.getElementById('dialogue-overlay').classList.add('hidden');
+                isTaskActive = false;
+                updateQuest(); // 提示玩家前往開寶箱
+                return;
+            }
+            // 第三關卡結束後，在地圖上產生麥穗或斧頭
+            if (currentDay === 3 && !secretTask2Done && !toolItem.active) {
+                toolItem.active = true;
+                document.getElementById('dialogue-overlay').classList.add('hidden');
+                isTaskActive = false;
+                updateQuest(); // 提示玩家去撿物資
+                return;
+            }
+
+            advanceDay();
+        }
+
+        // 神秘任務一：領主問答題
+        function showSecretTask1() {
+            isTaskActive = true;
+            document.getElementById('secret-task-overlay').classList.remove('hidden');
+            document.getElementById('secret-task-1-content').classList.remove('hidden');
+            document.getElementById('secret-task-2-content').classList.add('hidden');
+            document.getElementById('secret-task-consequence').classList.add('hidden');
+        }
+
+        function answerSecretTask1(ans) {
+            const consequence = document.getElementById('secret-task-consequence');
+            const resTitle = document.getElementById('secret-task-res-title');
+            const resText = document.getElementById('secret-task-res-text');
+            const statChanges = document.getElementById('secret-task-stat-changes');
+
+            consequence.classList.remove('hidden');
+
+            if (ans === 'B') {
+                player.wealth += 10;
+                resTitle.innerText = "🎉 答對了！";
+                resText.innerText = "你非常清楚自己在封建體制下效忠的直接對象是【莊園領主】（而不是遙遠的國王或無關係的鄰近騎士）！領主高興地賜予你 10 枚金幣。";
+                statChanges.innerHTML = `<span class="text-green-600">GOLD +10</span>`;
+            } else {
+                resTitle.innerText = "❌ 答錯了！";
+                resText.innerText = "雖然國王是名義上的土地擁有者，但在莊園制中，直接賜予你土地、向你索取勞役並保護你生命安全的人是【莊園領主】。守衛嘲笑了你的無知。";
+                statChanges.innerHTML = `<span class="text-gray-500">無變動</span>`;
+            }
+
+            updatePlayerStatsUI();
+        }
+
+        // 神秘任務二：按鍵連打 QTE 考驗
+        function showSecretTask2() {
+            isTaskActive = true;
+            document.getElementById('secret-task-overlay').classList.remove('hidden');
+            document.getElementById('secret-task-1-content').classList.add('hidden');
+            document.getElementById('secret-task-2-content').classList.remove('hidden');
+            document.getElementById('secret-task-consequence').classList.add('hidden');
+
+            const titleText = playerClass === 'peasant' ? "🌾 農民神秘任務：限時收割！" : "🪓 工匠神秘任務：限時打造工具！";
+            document.getElementById('mash-title').innerText = titleText;
+
+            mashCount = 0;
+            lastPressed = '';
+            mashActive = false; // 預設先不啟動計時與連打
+
+            document.getElementById('mash-count').innerText = 0;
+            document.getElementById('mash-progress-bar').style.width = '0%';
+            document.getElementById('mash-timer').innerText = '10.0';
+
+            // 顯示「開始挑戰」按鈕 (移除獨立的 AD 木製像素按鈕容器)
+            document.getElementById('qte-start-btn').classList.remove('hidden');
+
+            // 動態初始化 QTE 畫面元素
+            const pGraphic = document.getElementById('peasant-qte-graphic');
+            const aGraphic = document.getElementById('artisan-qte-graphic');
+            const wheatContainer = document.getElementById('wheat-container');
+
+            if (playerClass === 'peasant') {
+                pGraphic.classList.remove('hidden');
+                aGraphic.classList.add('hidden');
+                wheatContainer.innerHTML = '';
+                // 預先生成 50 棵待收割的麥穗（每棵代表 2 次按鍵完成度，共 100 次）
+                for (let i = 0; i < 50; i++) {
+                    const stalk = document.createElement('span');
+                    stalk.className = 'text-lg opacity-10 transition-all duration-75 filter grayscale inline-block select-none';
+                    stalk.innerText = '🌾';
+                    stalk.id = `wheat-stalk-${i}`;
+                    wheatContainer.appendChild(stalk);
+                }
+            } else {
+                pGraphic.classList.add('hidden');
+                aGraphic.classList.remove('hidden');
+                // 重設工匠工具零件顯示
+                document.getElementById('tool-handle').style.opacity = '0';
+                document.getElementById('tool-head').style.opacity = '0';
+                document.getElementById('tool-blade').style.opacity = '0';
+                document.getElementById('spark-effect').classList.add('hidden');
+            }
+        }
+
+        // 當點選【開始挑戰】按鈕時觸發
+        function startQTEChallenge() {
+            // 隱藏「開始挑戰」按鈕，學生此時可直接使用電腦鍵盤 [←]/[→] 鍵或 iPad 虛擬方向盤【左鍵】/【右鍵】進行連打
+            document.getElementById('qte-start-btn').classList.add('hidden');
+
+            mashActive = true;
+            mashTimer = 10.0;
+
+            clearInterval(mashInterval);
+            mashInterval = setInterval(() => {
+                mashTimer -= 0.1;
+                if (mashTimer <= 0) {
+                    mashTimer = 0;
+                    endMashGame(mashCount >= 100);
+                }
+                document.getElementById('mash-timer').innerText = mashTimer.toFixed(1);
+            }, 100);
+        }
+
+        function pressMash(button) {
+            if (!mashActive) return;
+
+            // 強制交替按鍵 A-D-A-D 才有成效
+            if (button !== lastPressed) {
+                mashCount++;
+                lastPressed = button;
+                document.getElementById('mash-count').innerText = mashCount;
+                
+                const percentage = Math.min(100, (mashCount / 100) * 100);
+                document.getElementById('mash-progress-bar').style.width = `${percentage}%`;
+
+                // 動態更新圖形視覺效果
+                if (playerClass === 'peasant') {
+                    // 100 次滿，每 2 次亮起一棵麥穗 (100/50 = 2)
+                    const activeCount = Math.floor(mashCount / 2);
+                    for (let i = 0; i < 50; i++) {
+                        const stalk = document.getElementById(`wheat-stalk-${i}`);
+                        if (stalk) {
+                            if (i < activeCount) {
+                                stalk.className = 'text-lg opacity-100 transition-all duration-75 filter-none scale-110 inline-block animate-bounce';
+                            } else {
+                                stalk.className = 'text-lg opacity-10 transition-all duration-75 filter grayscale inline-block';
+                            }
+                        }
+                    }
+                } else {
+                    // 工匠工具打磨完成度：分三階段漸進顯現 (0-100 次)
+                    const handle = document.getElementById('tool-handle');
+                    const head = document.getElementById('tool-head');
+                    const blade = document.getElementById('tool-blade');
+                    const spark = document.getElementById('spark-effect');
+
+                    if (handle) handle.style.opacity = Math.min(1, percentage / 30); // 0-30% 木製手柄
+                    if (head) head.style.opacity = Math.max(0, Math.min(1, (percentage - 30) / 40)); // 30-70% 鐵質斧頭
+                    if (blade) blade.style.opacity = Math.max(0, Math.min(1, (percentage - 70) / 30)); // 70-100% 刀刃白邊
+
+                    // 閃爍鍛造火花特效
+                    if (spark) {
+                        spark.classList.remove('hidden');
+                        setTimeout(() => spark.classList.add('hidden'), 60);
+                    }
+                }
+
+                if (mashCount >= 100) {
+                    endMashGame(true);
+                }
+            }
+        }
+
+        function endMashGame(success) {
+            mashActive = false;
+            clearInterval(mashInterval);
+
+            const consequence = document.getElementById('secret-task-consequence');
+            const resTitle = document.getElementById('secret-task-res-title');
+            const resText = document.getElementById('secret-task-res-text');
+            const statChanges = document.getElementById('secret-task-stat-changes');
+
+            consequence.classList.remove('hidden');
+
+            if (success) {
+                const maxHp = playerClass === 'peasant' ? 100 : 80;
+                player.health = Math.min(maxHp, player.health + 20);
+                resTitle.innerText = "🎉 任務成功！";
+                if (playerClass === 'peasant') {
+                    resText.innerText = "你爆發出非人的極致手速，將莊園整片麥田成功收割！充實的勞動與豐富的收成鍛鍊了你的體魄，生命值恢復 20 點！";
+                } else {
+                    resText.innerText = "火花四濺！你的打鐵頻率簡真堪稱奇蹟！一把寒光閃閃的頂級精銳工具成功出爐。你感到充滿成就感，生命值恢復 20 點！";
+                }
+                statChanges.innerHTML = `<span class="text-green-600">HP +20</span>`;
+            } else {
+                resTitle.innerText = "⏳ 挑戰失敗！";
+                resText.innerText = "你沒能在 10 秒內交替按下 100 次... 工作未完成，你的體力白白透支，未能獲得任何屬性加成。";
+                statChanges.innerHTML = `<span class="text-gray-500">無變動</span>`;
+            }
+
+            updatePlayerStatsUI();
+        }
+
+        // 完成神秘任務並前進至下一天
+        function finishSecretTask() {
+            document.getElementById('secret-task-overlay').classList.add('hidden');
+            
+            if (currentDay === 1) {
+                secretTask1Done = true;
+                chest.active = false;
+            } else if (currentDay === 3) {
+                secretTask2Done = true;
+                toolItem.active = false;
+            }
+
+            isTaskActive = false;
+            advanceDay();
+        }
+
+        // 前進至下一天
+        function advanceDay() {
+            document.getElementById('dialogue-overlay').classList.add('hidden'); // 完全變回地圖畫面
+            document.getElementById('overlay-choices-container').classList.add('hidden');
+            isTaskActive = false;
+
+            if (currentDay < 7) {
+                currentDay++;
+                updateQuest();
+            } else {
+                endGame();
+            }
+        }
+
+        function updateQuest() {
+            if (chest.active) {
+                document.getElementById('quest-text').innerText = "✨ 地圖上出現了神秘寶箱！快去尋找並開啟！";
+                return;
+            }
+            if (toolItem.active) {
+                const label = playerClass === 'peasant' ? "麥穗" : "斧頭";
+                document.getElementById('quest-text').innerText = `✨ 地圖上散落著神聖的【${label}】！快去拾起觸發神秘試煉！`;
+                return;
+            }
+
+            const currentQuest = questData[currentDay];
+            const guide = (playerClass === 'peasant') ? currentQuest.guidePeasant : currentQuest.guideArtisan;
+            document.getElementById('quest-text').innerText = guide;
+            document.getElementById('day-indicator').innerText = currentDay;
+
+            // 時鐘前進效果
+            const hours = 6 + currentDay * 2;
+            document.getElementById('clock-time').innerText = `${hours.toString().padStart(2, '0')}:10 AM`;
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('ending-screen').classList.remove('hidden');
+
+            let reason = "";
+            if (currentDay < 7) {
+                // 在第七天城堡防守戰前死亡
+                if (player.health <= 0) {
+                    reason = "在重重的勞役、鞭笞與疾病摧殘下，你的身體終於支撐不住。你病死在莊園陰暗潮濕的泥地上，甚至沒有一塊乾淨的草蓆。在封建制度下，平民的生命極為脆弱且廉價，你只是領主財產上一個隨時可被替換的生產工具。";
+                } else {
+                    reason = "你的最後一枚銅板已被剝削殆盡，在「自給自足」的莊園中你無法換取任何糧食。在寒風刺骨的冬天，你與家人在漏風的茅草屋中無助地活活餓死。階級的世襲讓你至死也無法擺擺脫貧困的泥沼。";
+                }
+            } else {
+                // 在第七天城堡防守戰時死亡
+                if (player.health <= 0) {
+                    reason = "外部莊園來襲，封建『效忠與保護』的契約化為泡影。你被強制推去城牆外充當肉盾，最終在重裝騎士的鐵蹄之下血肉模糊、悲慘死去。世襲制度下，平民注定是權貴在戰亂中隨手可棄的擋箭牌。";
+                } else if (player.wealth <= 0) {
+                    reason = "你交出了最後一枚金幣買命，換得了城堡大門背後的一角喘息之機。然而在自給自足莊園經濟完全崩潰、外敵將你家園洗劫一空的前提下，身無分文的你在城堡陰暗冰冷的牆角中孤獨地活活餓死。";
+                } else {
+                    reason = "外部莊園來襲，封建『保護』的承諾被徹底粉碎。城堡守衛在大門前無情將你拒之門外，你在隨後的戰亂與飢餓中痛苦死去，這就是封建世襲制度下底層平民難以翻身的歷史悲歌。";
+                }
+            }
+            document.getElementById('death-reason').innerText = reason;
+        }
+
+        // 像素風地圖渲染
+        function drawMap() {
+            // 1. 溫暖翠綠的草地底色
+            ctx.fillStyle = '#70a03c';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 2. 繪製棋盤狀的精美草叢點綴
+            for (let r = 0; r < ROWS * 2; r++) {
+                for (let c = 0; c < COLS * 2; c++) {
+                    if ((r + c) % 5 === 0) {
+                        ctx.fillStyle = '#5c8e32'; 
+                        ctx.fillRect(c * 20 + 2, r * 20 + 2, 4, 4);
+                        ctx.fillRect(c * 20 + 10, r * 20 + 8, 3, 3);
+                    }
+                }
+            }
+
+            // 3. 繪製溫慢黃土色泥土小徑
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    const tile = mapMatrix[r][c];
+                    const tx = c * TILE_SIZE;
+                    const ty = r * TILE_SIZE;
+
+                    // 避免在城堡中心地帶繪製普通黃土路
+                    if (tile === 0 && r > 3 && r < 8 && c > 1 && c < 14 && !(r >= 4 && r <= 6 && c >= 6 && c <= 9)) {
+                        ctx.fillStyle = '#df9b43'; 
+                        ctx.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
+                        
+                        ctx.fillStyle = '#cda275';
+                        ctx.fillRect(tx + 4, ty + 4, 3, 3);
+                        ctx.fillRect(tx + 28, ty + 24, 2, 2);
+                    }
+                }
+            }
+
+            // 4. 繪製耕地 (深褐色土地)
+            const fieldX = 60, fieldY = 360, fieldW = 100, fieldH = 80;
+            ctx.fillStyle = '#6d4c2c'; 
+            ctx.fillRect(fieldX, fieldY, fieldW, fieldH);
+            ctx.strokeStyle = '#4d2b12';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(fieldX, fieldY, fieldW, fieldH);
+
+            // 在耕地裡種下整齊的像素蔬菜列
+            ctx.fillStyle = '#a3d13b';
+            for (let col = 0; col < 4; col++) {
+                for (let row = 0; row < 3; row++) {
+                    const cx = fieldX + 12 + col * 24;
+                    const cy = fieldY + 14 + row * 24;
+                    ctx.fillRect(cx, cy, 6, 6);
+                    ctx.fillRect(cx - 2, cy + 2, 10, 2);
+                    ctx.fillStyle = '#83b320';
+                    ctx.fillRect(cx + 2, cy - 2, 2, 2);
+                    ctx.fillStyle = '#a3d13b';
+                }
+            }
+
+            // 5. 繪製加長至與泥地同長（x=80 至 x=240）、可供角色自由穿透通過的木質欄杆
+            ctx.fillStyle = '#4d2b12';
+            for (let x = 80; x <= 240; x += 16) {
+                ctx.fillRect(x, 150, 4, 12); // 木製立柱
+                if (x < 240) ctx.fillRect(x, 152, 16, 3); // 橫拉木條
+            }
+
+            // 6. 繪製像素風格的紅瓦小木屋
+            ctx.fillStyle = '#4d2b12'; 
+            ctx.fillRect(40, 30, 80, 50);
+            ctx.fillStyle = '#b58350'; 
+            ctx.fillRect(43, 40, 74, 37);
+            ctx.fillStyle = '#ab3c2d'; 
+            ctx.beginPath();
+            ctx.moveTo(35, 40);
+            ctx.lineTo(80, 15);
+            ctx.lineTo(125, 40);
+            ctx.closePath();
+            ctx.fill();
+            // 門和窗
+            ctx.fillStyle = '#4d2b12';
+            ctx.fillRect(72, 57, 16, 20); 
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(50, 48, 12, 10); 
+            ctx.strokeStyle = '#4d2b12';
+            ctx.strokeRect(50, 48, 12, 10);
+
+            // 7. 繪製地圖阻擋松樹 (排除縮短後的木製欄杆格點防重疊)
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    const tile = mapMatrix[r][c];
+                    const tx = c * TILE_SIZE;
+                    const ty = r * TILE_SIZE;
+
+                    // 排除中央城堡範圍與左側木柵欄範圍
+                    const isCastle = (r >= 4 && r <= 6 && c >= 6 && c <= 9);
+                    const isFence = (r === 3 && c >= 4 && c <= 5); // 僅阻擋 c=4,5 格點
+
+                    if (tile === 1 && !isCastle && !isFence) {
+                        ctx.fillStyle = '#264e1c'; 
+                        ctx.beginPath();
+                        ctx.moveTo(tx + 20, ty);
+                        ctx.lineTo(tx + 6, ty + 25);
+                        ctx.lineTo(tx + 34, ty + 25);
+                        ctx.closePath();
+                        ctx.fill();
+
+                        ctx.beginPath();
+                        ctx.moveTo(tx + 20, ty + 10);
+                        ctx.lineTo(tx + 2, ty + 35);
+                        ctx.lineTo(tx + 38, ty + 35);
+                        ctx.closePath();
+                        ctx.fill();
+
+                        ctx.fillStyle = '#73411a'; 
+                        ctx.fillRect(tx + 17, ty + 35, 6, 8);
+                    }
+                }
+            }
+
+            // ====== 繪製莊園正中央的領主城堡 ======
+            const castleX = 240;
+            const castleY = 160;
+            const castleW = 160;
+            const castleH = 100;
+            
+            // 城堡影子
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fillRect(castleX - 10, castleY + castleH - 10, castleW + 20, 20);
+            
+            // 城堡主牆
+            ctx.fillStyle = '#4b5563'; 
+            ctx.fillRect(castleX, castleY + 20, castleW, castleH - 20);
+            
+            // 城堡主牆頂部城牆垛
+            ctx.fillStyle = '#374151'; 
+            for (let x = castleX; x < castleX + castleW; x += 32) {
+                ctx.fillRect(x, castleY + 10, 16, 10);
+            }
+            
+            // 左右高塔
+            ctx.fillStyle = '#374151';
+            ctx.fillRect(castleX - 10, castleY, 30, castleH);
+            ctx.fillStyle = '#991b1b';
+            ctx.beginPath();
+            ctx.moveTo(castleX - 15, castleY);
+            ctx.lineTo(castleX + 5, castleY - 25);
+            ctx.lineTo(castleX + 25, castleY);
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.fillStyle = '#374151';
+            ctx.fillRect(castleX + castleW - 20, castleY, 30, castleH);
+            ctx.fillStyle = '#991b1b';
+            ctx.beginPath();
+            ctx.moveTo(castleX + castleW - 25, castleY);
+            ctx.lineTo(castleX + castleW - 5, castleY - 25);
+            ctx.lineTo(castleX + castleW + 5, castleY);
+            ctx.closePath();
+            ctx.fill();
+            
+            // 城堡大門
+            ctx.fillStyle = '#1f2937'; 
+            ctx.fillRect(castleX + castleW/2 - 20, castleY + castleH - 40, 40, 40);
+            // 鐵柵欄
+            ctx.strokeStyle = '#9ca3af';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(castleX + castleW/2 - 20, castleY + castleH - 40, 40, 40);
+            ctx.beginPath();
+            ctx.moveTo(castleX + castleW/2 - 10, castleY + castleH - 40);
+            ctx.lineTo(castleX + castleW/2 - 10, castleY + castleH);
+            ctx.moveTo(castleX + castleW/2, castleY + castleH - 40);
+            ctx.lineTo(castleX + castleW/2, castleY + castleH);
+            ctx.moveTo(castleX + castleW/2 + 10, castleY + castleH - 40);
+            ctx.lineTo(castleX + castleW/2 + 10, castleY + castleH);
+            ctx.stroke();
+            
+            // 城堡小窗戶
+            ctx.fillStyle = '#fef08a'; 
+            ctx.fillRect(castleX + 40, castleY + 40, 10, 15);
+            ctx.fillRect(castleX + castleW - 50, castleY + 40, 10, 15);
+            ctx.strokeStyle = '#374151';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(castleX + 40, castleY + 40, 10, 15);
+            ctx.strokeRect(castleX + castleW - 50, castleY + 40, 10, 15);
+
+            // 領主旗幟
+            ctx.fillStyle = '#4d2b12'; 
+            ctx.fillRect(castleX + castleW/2 - 2, castleY - 15, 4, 25);
+            ctx.fillStyle = '#b91c1c'; 
+            ctx.beginPath();
+            ctx.moveTo(castleX + castleW/2 + 2, castleY - 15);
+            ctx.lineTo(castleX + castleW/2 + 30, castleY - 8);
+            ctx.lineTo(castleX + castleW/2 + 2, castleY);
+            ctx.closePath();
+            ctx.fill();
+
+            // 如果第七天有敵軍入侵，繪製微弱的烽火與紅光遮罩效果
+            if (currentDay === 7) {
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // 城堡周圍烽火裝飾
+                const pulse = Math.sin(Date.now() / 100) * 5;
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(100, 80, 15 + pulse, 0, Math.PI * 2);
+                ctx.arc(520, 320, 18 + pulse, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#f97316';
+                ctx.beginPath();
+                ctx.arc(100, 80, 8 + pulse/2, 0, Math.PI * 2);
+                ctx.arc(520, 320, 10 + pulse/2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 8. 讓小動物在草地上散步
+            animals.forEach(ani => {
+                ani.timer += 1;
+                if (ani.timer > 100) {
+                    ani.vx = (Math.random() - 0.5) * 0.5;
+                    ani.vy = (Math.random() - 0.5) * 0.5;
+                    ani.timer = 0;
+                }
+                
+                let nx = ani.x + ani.vx;
+                let ny = ani.y + ani.vy;
+                
+                const inCastle = (nx > castleX - 15 && nx < castleX + castleW + 15 && ny > castleY - 15 && ny < castleY + castleH + 15);
+                if (nx > 40 && nx < 600 && !inCastle) ani.x = nx;
+                if (ny > 40 && ny < 440 && !inCastle) ani.y = ny;
+
+                ctx.fillStyle = 'rgba(0,0,0,0.15)';
+                ctx.beginPath();
+                ctx.ellipse(ani.x + 12, ani.y + 20, 10, 4, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.font = '20px Arial';
+                ctx.fillText(ani.emoji, ani.x, ani.y + 15);
+            });
+
+            // 8.1 繪製地圖上的神秘寶箱 (🎁)
+            if (chest.active) {
+                ctx.fillStyle = 'rgba(0,0,0,0.25)';
+                ctx.beginPath();
+                ctx.ellipse(chest.x + 16, chest.y + 32, 12, 5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 金色高亮閃光環
+                ctx.strokeStyle = '#fbbf24';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(chest.x - 2, chest.y - 2, 36, 36);
+
+                const blink = Math.floor(Date.now() / 200) % 2 === 0;
+                if (blink) {
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(chest.x + 12, chest.y - 12, 6, 6);
+                    ctx.font = 'bold 12px "DotGothic16"';
+                    ctx.fillText("?", chest.x + 13, chest.y - 2);
+                }
+
+                ctx.font = '24px Arial';
+                ctx.fillText(chest.emoji, chest.x + 4, chest.y + 26);
+            }
+
+            // 8.2 繪製地圖上的神秘物資 (🌾 麥穗 或 🪓 斧頭)
+            if (toolItem.active) {
+                ctx.fillStyle = 'rgba(0,0,0,0.25)';
+                ctx.beginPath();
+                ctx.ellipse(toolItem.x + 16, toolItem.y + 32, 12, 5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 翠綠色高亮閃光環
+                ctx.strokeStyle = '#10b981';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(toolItem.x - 2, toolItem.y - 2, 36, 36);
+
+                const blink = Math.floor(Date.now() / 200) % 2 === 0;
+                if (blink) {
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(toolItem.x + 12, toolItem.y - 12, 6, 6);
+                    ctx.font = 'bold 12px "DotGothic16"';
+                    ctx.fillText("!", toolItem.x + 13, toolItem.y - 2);
+                }
+
+                ctx.font = '24px Arial';
+                ctx.fillText(toolItem.emoji, toolItem.x + 4, toolItem.y + 26);
+            }
+
+            // 9. 繪製地圖上站立的 NPC 角色
+            Object.keys(npcs).forEach(key => {
+                const npc = npcs[key];
+                
+                // NPC 影子
+                ctx.fillStyle = 'rgba(0,0,0,0.25)';
+                ctx.beginPath();
+                ctx.ellipse(npc.x + 16, npc.y + 32, 12, 5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 任務金色高亮指示環
+                const currentQuest = questData[currentDay];
+                // 當有神秘任務時，隱藏普通NPC的提示高光，聚焦到新道具上
+                if (currentQuest && currentQuest.target === key && !chest.active && !toolItem.active) {
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 4;
+                    ctx.strokeRect(npc.x - 2, npc.y - 2, 36, 36);
+                    
+                    ctx.strokeStyle = '#df9b43'; 
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(npc.x, npc.y, 32, 32);
+
+                    const blink = Math.floor(Date.now() / 200) % 2 === 0;
+                    if (blink) {
+                        ctx.fillStyle = '#fff';
+                        ctx.fillRect(npc.x + 12, npc.y - 12, 6, 6);
+                        ctx.font = 'bold 12px "DotGothic16"';
+                        ctx.fillText("!", npc.x + 13, npc.y - 2);
+                    }
+                }
+
+                ctx.font = '24px Arial';
+                ctx.fillText(npc.emoji, npc.x + 4, npc.y + 26);
+
+                ctx.font = 'bold 11px "DotGothic16"';
+                ctx.fillStyle = '#4d2b12';
+                const textWidth = ctx.measureText(npc.name).width;
+                ctx.fillStyle = '#f7e6c4';
+                ctx.fillRect(npc.x + 16 - textWidth/2 - 4, npc.y - 14, textWidth + 8, 14);
+                ctx.strokeStyle = '#4d2b12';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(npc.x + 16 - textWidth/2 - 4, npc.y - 14, textWidth + 8, 14);
+                
+                ctx.fillStyle = '#4d2b12';
+                ctx.fillText(npc.name, npc.x + 16 - textWidth/2, npc.y - 3);
+            });
+
+            // 10. 繪製主角（農民/工匠）- 實色像素風格
+            ctx.fillStyle = 'rgba(0,0,0,0.25)';
+            ctx.beginPath();
+            ctx.ellipse(player.x + 16, player.y + 28, 10, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            const isPeasant = (playerClass === 'peasant');
+            const skinColor = '#fcd5b5';                               
+            const hairColor = isPeasant ? '#5c4033' : '#1e293b';       
+            const shirtColor = isPeasant ? '#15803d' : '#b91c1c';      
+            const pantsColor = isPeasant ? '#1d4ed8' : '#475569';      
+            const accessoryColor = isPeasant ? '#eab308' : '#f97316';  
+
+            const px = player.x;
+            const py = player.y;
+
+            ctx.fillStyle = shirtColor;
+            ctx.fillRect(px + 8, py + 14, 16, 10); 
+            ctx.fillRect(px + 4, py + 14, 4, 8);   
+            ctx.fillRect(px + 24, py + 14, 4, 8);  
+
+            ctx.fillStyle = pantsColor;
+            ctx.fillRect(px + 8, py + 24, 6, 6);   
+            ctx.fillRect(px + 18, py + 24, 6, 6);  
+            ctx.fillStyle = '#3e2723';             
+            ctx.fillRect(px + 8, py + 30, 6, 2);
+            ctx.fillRect(px + 18, py + 30, 6, 2);
+
+            ctx.fillStyle = skinColor;
+            ctx.fillRect(px + 10, py + 6, 12, 8);  
+            ctx.fillStyle = '#0f172a';             
+            ctx.fillRect(px + 12, py + 9, 2, 2);
+            ctx.fillRect(px + 18, py + 9, 2, 2);
+
+            ctx.fillStyle = hairColor;
+            ctx.fillRect(px + 8, py + 4, 16, 2);   
+            ctx.fillRect(px + 8, py + 6, 2, 6);    
+            ctx.fillRect(px + 22, py + 6, 2, 6);   
+
+            if (isPeasant) {
+                ctx.fillStyle = accessoryColor;
+                ctx.fillRect(px + 6, py + 2, 20, 2); 
+                ctx.fillRect(px + 10, py, 12, 2);    
+                ctx.fillStyle = '#b45309';           
+                ctx.fillRect(px + 10, py + 2, 12, 1);
+            } else {
+                ctx.fillStyle = accessoryColor;
+                ctx.fillRect(px + 8, py + 2, 16, 2); 
+            }
+        }
+
+        function updatePlayerPosition() {
+            if (isTaskActive) return;
+
+            let dx = 0, dy = 0;
+            if (keys['w'] || keys['arrowup']) dy = -player.speed;
+            if (keys['s'] || keys['arrowdown']) dy = player.speed;
+            if (keys['a'] || keys['arrowleft']) dx = -player.speed;
+            if (keys['d'] || keys['arrowright']) dx = player.speed;
+
+            let newX = Math.max(0, Math.min(canvas.width - player.width, player.x + dx));
+            let newY = Math.max(0, Math.min(canvas.height - player.height, player.y + dy));
+
+            const checkCollision = (px, py) => {
+                const x1 = Math.floor(px / TILE_SIZE), y1 = Math.floor(py / TILE_SIZE);
+                const x2 = Math.floor((px + player.width - 1) / TILE_SIZE), y2 = Math.floor((py + player.height - 1) / TILE_SIZE);
+                if (x1 < 0 || x2 >= COLS || y1 < 0 || y2 >= ROWS) return true;
+                return mapMatrix[y1][x1] === 1 || mapMatrix[y1][x2] === 1 || mapMatrix[y2][x1] === 1 || mapMatrix[y2][x2] === 1;
+            };
+
+            if (!checkCollision(newX, player.y)) player.x = newX;
+            if (!checkCollision(player.x, newY)) player.y = newY;
+
+            // 判斷當前的互動提示距離
+            let dist = 999;
+            if (chest.active) {
+                // 如果有寶箱，提示範圍依據寶箱距離
+                dist = Math.hypot((player.x + 16) - (chest.x + 16), (player.y + 16) - (chest.y + 16));
+            } else if (toolItem.active) {
+                // 如果有神秘物資，提示範圍依據物資距離
+                dist = Math.hypot((player.x + 16) - (toolItem.x + 16), (player.y + 16) - (toolItem.y + 16));
+            } else {
+                // 一般任務對話距離
+                const currentQuest = questData[currentDay];
+                const npc = npcs[currentQuest.target];
+                dist = Math.hypot((player.x + 16) - (npc.x + 20), (player.y + 16) - (npc.y + 20));
+            }
+
+            const prompt = document.getElementById('interact-prompt');
+            if (dist < 45) prompt.classList.remove('hidden');
+            else prompt.classList.add('hidden');
+        }
+
+        function gameLoop() {
+            updatePlayerPosition();
+            drawMap();
+            requestAnimationFrame(gameLoop);
+        }
+    </script>
+</body>
+</html>
